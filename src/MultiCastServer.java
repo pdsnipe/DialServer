@@ -43,15 +43,15 @@ public class MultiCastServer implements Runnable
         return dp;
     }
 
-    public void sendMSearch() throws IOException {
-        byte[] buf = new byte[1024];
-        MSearch mSearch = new MSearch();
-        InetAddress IPAddress = InetAddress.getByName("239.255.255.250");
-        buf = mSearch.toString().getBytes();
-        DatagramPacket dp = new DatagramPacket(buf,buf.length,IPAddress, 1900);
-        mSSDPSocket.send(dp);
-
-    }
+//    public void sendMSearch() throws IOException {
+//        byte[] buf = new byte[1024];
+//        MSearch mSearch = new MSearch();
+//        InetAddress IPAddress = InetAddress.getByName("239.255.255.250");
+//        buf = mSearch.toString().getBytes();
+//        DatagramPacket dp = new DatagramPacket(buf,buf.length,IPAddress, 1900);
+//        mSSDPSocket.send(dp);
+//
+//    }
 
     public void sendSearchResponse() throws IOException {
         byte[] buf = new byte[1024];
@@ -79,30 +79,30 @@ public class MultiCastServer implements Runnable
         }
     }
 
-    public Boolean analyzeDatagramForMSeachResponse(DatagramPacket datagramPacket) {
-        String message = new String(datagramPacket.getData());
+//    public Boolean analyzeDatagramForMSeachResponse(DatagramPacket datagramPacket) {
+//        String message = new String(datagramPacket.getData());
+//
+//        if(message.contains("HTTP/1.1 200 OK") && message.contains("ST: urn:dial-multiscreen-org:service:dial:1")) {
+//            return true;
+//        }
+//        return false;
+//    }
 
-        if(message.contains("HTTP/1.1 200 OK") && message.contains("ST: urn:dial-multiscreen-org:service:dial:1")) {
-            return true;
-        }
-        return false;
-    }
-
-    public String getLocationFromDatagram(DatagramPacket datagramPacket) {
-
-        String message = new String(datagramPacket.getData());
-
-        List<String> temp = Arrays.asList(message.split(" "));
-
-        for(String t: temp) {
-            System.out.println(t);
-        }
-
-        System.out.println(temp.indexOf("LOCATION:"));
-
-        return "";
-
-    }
+//    public String getLocationFromDatagram(DatagramPacket datagramPacket) {
+//
+//        String message = new String(datagramPacket.getData());
+//
+//        List<String> temp = Arrays.asList(message.split(" "));
+//
+//        for(String t: temp) {
+//            System.out.println(t);
+//        }
+//
+//        System.out.println(temp.indexOf("LOCATION:"));
+//
+//        return temp.get(temp.indexOf(temp.indexOf("LOCATION:")+1));
+//
+//    }
 
     @Override
     public void run() {
@@ -122,7 +122,7 @@ public class MultiCastServer implements Runnable
 //                }
 
             }catch (IOException e){
-                System.out.println("IO exception");
+               e.printStackTrace();
             }
 
         }

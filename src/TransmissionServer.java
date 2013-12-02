@@ -40,43 +40,43 @@ public class TransmissionServer {
 
     private static BasicRpcService rpcService = new BasicRpcService();
 
-    public void sendTestPost() throws Exception,RpcException {
-
-        String url = "http://localhost:52235/transmission/torrent";
-
-        HttpClient client = new DefaultHttpClient();
-        HttpPost post = new HttpPost(url);
-
-        // add header
-        post.setHeader("User-Agent", "Mozilla/5.0");
-
-        List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
-        urlParameters.add(new BasicNameValuePair("add","magnet:?xt=urn:btih:727665E0FE70263CD0B715758C2E8DB9A78554EC&dn=white+house+down+2013+720p+brrip+x264+yify&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopen.demonii.com%3A1337"));
-        urlParameters.add(new BasicNameValuePair("add", "magnet:?xt=urn:btih:9df7c1554742bfeaa226faea683541958bbc44cf&dn=Bitcoin+Exposed%2C+Today%27s+Complete+Guide+to+Tomorrow%27s+Currency&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337"));
-        post.setEntity(new UrlEncodedFormEntity(urlParameters));
-
-        HttpResponse response = client.execute(post);
-        System.out.println("\nSending 'POST' request to URL : " + url);
-        System.out.println("Post parameters : " + post.getEntity());
-        System.out.println("Response Code : " +
-                response.getStatusLine().getStatusCode());
-
-        BufferedReader rd = new BufferedReader(
-                new InputStreamReader(response.getEntity().getContent()));
-
-        StringBuffer result = new StringBuffer();
-        String line = "";
-        while ((line = rd.readLine()) != null) {
-            result.append(line);
-        }
-
-        System.out.println(result.toString());
-
-    }
+//    public void sendTestPost() throws Exception,RpcException {
+//
+//        String url = "http://localhost:52235/transmission/torrent";
+//
+//        HttpClient client = new DefaultHttpClient();
+//        HttpPost post = new HttpPost(url);
+//
+//        // add header
+//        post.setHeader("User-Agent", "Mozilla/5.0");
+//
+//        List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
+//        urlParameters.add(new BasicNameValuePair("add","magnet:?xt=urn:btih:727665E0FE70263CD0B715758C2E8DB9A78554EC&dn=white+house+down+2013+720p+brrip+x264+yify&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Fopen.demonii.com%3A1337"));
+//        urlParameters.add(new BasicNameValuePair("add", "magnet:?xt=urn:btih:9df7c1554742bfeaa226faea683541958bbc44cf&dn=Bitcoin+Exposed%2C+Today%27s+Complete+Guide+to+Tomorrow%27s+Currency&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80&tr=udp%3A%2F%2Ftracker.istole.it%3A6969&tr=udp%3A%2F%2Ftracker.ccc.de%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337"));
+//        post.setEntity(new UrlEncodedFormEntity(urlParameters));
+//
+//        HttpResponse response = client.execute(post);
+//        System.out.println("\nSending 'POST' request to URL : " + url);
+//        System.out.println("Post parameters : " + post.getEntity());
+//        System.out.println("Response Code : " +
+//                response.getStatusLine().getStatusCode());
+//
+//        BufferedReader rd = new BufferedReader(
+//                new InputStreamReader(response.getEntity().getContent()));
+//
+//        StringBuffer result = new StringBuffer();
+//        String line = "";
+//        while ((line = rd.readLine()) != null) {
+//            result.append(line);
+//        }
+//
+//        System.out.println(result.toString());
+//
+//    }
 
     public TransmissionServer(int port) throws IOException{
         server = HttpServer.create(new InetSocketAddress(port), 0);
-        server.createContext("/", new MyHandler());
+        server.createContext("/transmission", new MyHandler());
         server.setExecutor(null);
         server.start();
     }
@@ -85,7 +85,8 @@ public class TransmissionServer {
     static class MyHandler implements HttpHandler {
         public void handle(HttpExchange t) throws IOException {
 
-            System.out.println("Request body: "+t.getRequestMethod());
+            String response = "";
+//            System.out.println("Request body: "+t.getRequestMethod());
             if(t.getRequestMethod().equals("POST")) {
                 InputStream is = t.getRequestBody();
                 StringWriter writer = new StringWriter();
@@ -101,35 +102,41 @@ public class TransmissionServer {
                 if(postParams.containsKey("add")) {
                     try{
                         rpcService.addTorrent(URLDecoder.decode(postParams.get("add")));
+                        response += "ADD SUCCESS\n";
                     }catch(RpcException e) {
+                        response += "ADD FAILURE\n";
                         System.out.println(e.toString());
-                    }
 
+                    }
                 }
                 if(postParams.containsKey("stop")) {
                     try{
                         rpcService.stopDownloads();
+                        response += "STOP SUCCESS\n";
                     }catch(RpcException e) {
+                        response += "STOP FAILURE\n";
                         System.out.println(e.toString());
                     }
                 }
                 if(postParams.containsKey("resume")) {
                     try{
                         rpcService.resumeDownloads();
+                        response += "RESUME SUCCESS\n";
                     }catch(RpcException e) {
+                        response += "RESUME FAILURE\n";
                         System.out.println(e.toString());
                     }
                 }
 
             }
+            else if(t.getRequestMethod().equals("GET")) {
 
+            }
 
-
-//            String response = "This is the response";
-//            t.sendResponseHeaders(200, response.length());
-//            OutputStream os = t.getResponseBody();
-//            os.write(response.getBytes());
-//            os.close();
+            t.sendResponseHeaders(200, response.length());
+            OutputStream os = t.getResponseBody();
+            os.write(response.getBytes());
+            os.close();
         }
     }
 
