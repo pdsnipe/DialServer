@@ -106,20 +106,20 @@ public class MultiCastServer implements Runnable
 
     @Override
     public void run() {
-        try {
-            this.sendMSearch();
-        }catch (IOException e) {
-            System.out.println("Error sending MSearch");
-        }
+//        try {
+//            this.sendMSearch();
+//        }catch (IOException e) {
+//            System.out.println("Error sending MSearch");
+//        }
         while(true) {
             try{
                 DatagramPacket dp = this.receive();
-//                if(analyzeDatagramForDial(dp)) {
-//                    this.sendSearchResponse();
-//                }
-                if(analyzeDatagramForMSeachResponse(dp)) {
-                    this.getLocationFromDatagram(dp);
+                if(analyzeDatagramForDial(dp)) {
+                    this.sendSearchResponse();
                 }
+//                if(analyzeDatagramForMSeachResponse(dp)) {
+//                    this.getLocationFromDatagram(dp);
+//                }
 
             }catch (IOException e){
                 System.out.println("IO exception");
