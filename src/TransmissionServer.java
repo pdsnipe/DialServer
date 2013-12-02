@@ -34,7 +34,7 @@ import java.net.URLDecoder;
 
 
 
-public class HTTPServer{
+public class TransmissionServer {
 
     private HttpServer server;
 
@@ -74,7 +74,7 @@ public class HTTPServer{
 
     }
 
-    public HTTPServer(int port) throws IOException{
+    public TransmissionServer(int port) throws IOException{
         server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/", new MyHandler());
         server.setExecutor(null);

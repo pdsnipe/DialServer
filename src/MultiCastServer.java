@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.Arrays;
 
 
-public class DialServer implements Runnable
+public class MultiCastServer implements Runnable
 {
 
     SocketAddress mSSDPMulticastGroup;
     MulticastSocket mSSDPSocket;
 
-    public DialServer() throws IOException {
+    public MultiCastServer() throws IOException {
         InetAddress localInAddress = InetAddress.getLocalHost();
 
         mSSDPMulticastGroup = new InetSocketAddress(SSDP.ADDRESS, SSDP.PORT);
@@ -106,21 +106,20 @@ public class DialServer implements Runnable
 
     @Override
     public void run() {
-       // System.out.println("Started");
-        try {
-            this.sendMSearch();
-        }catch (IOException e) {
-            System.out.println("Error sending MSearch");
-        }
+//        try {
+//            this.sendMSearch();
+//        }catch (IOException e) {
+//            System.out.println("Error sending MSearch");
+//        }
         while(true) {
             try{
                 DatagramPacket dp = this.receive();
                 if(analyzeDatagramForDial(dp)) {
                     this.sendSearchResponse();
                 }
-                if(analyzeDatagramForMSeachResponse(dp)) {
-                    this.getLocationFromDatagram(dp);
-                }
+//                if(analyzeDatagramForMSeachResponse(dp)) {
+//                    this.getLocationFromDatagram(dp);
+//                }
 
             }catch (IOException e){
                 System.out.println("IO exception");

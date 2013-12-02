@@ -6,7 +6,7 @@
     <groupId>network-project</groupId>
     <version>1.0-Snapshot</version>
     <artifactId>dial-server</artifactId>
-    <name>DialServer</name>
+    <name>MultiCastServer</name>
 
     <properties>
         <jackson.version>2.2.3</jackson.version>
