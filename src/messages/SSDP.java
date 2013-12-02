@@ -1,3 +1,5 @@
+package messages;
+
 /**
  * Created with IntelliJ IDEA.
  * User: pd_snipe
@@ -30,5 +32,7 @@ public class SSDP
     public static final String EXIT = "EXIT:";
     public static final String BOOTID = "BOOTID.UPNP.ORG: 1";
     public static final String SERVER = "SERVER: OS/version UPnP/1.1 product/version";
+
+    public static final String ST_DISCOVER = "MAN: \"ssdp:discover\"";
 
 }

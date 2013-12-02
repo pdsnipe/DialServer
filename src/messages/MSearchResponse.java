@@ -1,3 +1,5 @@
+package messages;
+
 /**
  * Created with IntelliJ IDEA.
  * User: pd_snipe

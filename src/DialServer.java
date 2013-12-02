@@ -1,11 +1,9 @@
-/**
- * Created with IntelliJ IDEA.
- * User: pd_snipe
- * Date: 11/18/13
- * Time: 1:59 AM
- * To change this template use File | Settings | File Templates.
- */
+//make sure you read incoming searches right
+//make sure the response is sent correctly  i.e. the ip is right
 
+import messages.MSearch;
+import messages.MSearchResponse;
+import messages.SSDP;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -15,6 +13,8 @@ import java.net.NetworkInterface;
 import java.net.SocketAddress;
 import java.net.DatagramPacket;
 
+import java.util.List;
+import java.util.Arrays;
 
 
 public class DialServer implements Runnable
@@ -25,7 +25,6 @@ public class DialServer implements Runnable
 
     public DialServer() throws IOException {
         InetAddress localInAddress = InetAddress.getLocalHost();
-        System.out.println("Local address: " + localInAddress.getHostAddress());
 
         mSSDPMulticastGroup = new InetSocketAddress(SSDP.ADDRESS, SSDP.PORT);
         mSSDPSocket = new MulticastSocket(1900);
@@ -44,13 +43,33 @@ public class DialServer implements Runnable
         return dp;
     }
 
-    public void sendResponse() {
+    public void sendMSearch() throws IOException {
+        byte[] buf = new byte[1024];
+        MSearch mSearch = new MSearch();
+        InetAddress IPAddress = InetAddress.getByName("239.255.255.250");
+        buf = mSearch.toString().getBytes();
+        DatagramPacket dp = new DatagramPacket(buf,buf.length,IPAddress, 1900);
+        mSSDPSocket.send(dp);
+
+    }
+
+    public void sendSearchResponse() throws IOException {
+        byte[] buf = new byte[1024];
+        MSearchResponse mresponse = new MSearchResponse("http://"+InetAddress.getLocalHost().getHostAddress()+""+"/transmission");
+        InetAddress IPAddress = InetAddress.getByName("239.255.255.250");
+        buf = mresponse.toString().getBytes();
+        DatagramPacket dp = new DatagramPacket(buf,buf.length,IPAddress, 1900);
+        mSSDPSocket.send(dp);
 
     }
 
     public Boolean analyzeDatagramForDial(DatagramPacket datagramPacket) {
-        if(datagramPacket.getData().toString().contains("urn:dial-multiscreen-org:service:dial:1"))
+
+        String message = new String(datagramPacket.getData());
+
+        if(message.contains("M-SEARCH * HTTP/1.1") && message.contains("ST: urn:dial-multiscreen-org:service:dial:1")) {
             return true;
+        }
         return false;
     }
 
@@ -60,14 +79,49 @@ public class DialServer implements Runnable
         }
     }
 
+    public Boolean analyzeDatagramForMSeachResponse(DatagramPacket datagramPacket) {
+        String message = new String(datagramPacket.getData());
+
+        if(message.contains("HTTP/1.1 200 OK") && message.contains("ST: urn:dial-multiscreen-org:service:dial:1")) {
+            return true;
+        }
+        return false;
+    }
+
+    public String getLocationFromDatagram(DatagramPacket datagramPacket) {
+
+        String message = new String(datagramPacket.getData());
+
+        List<String> temp = Arrays.asList(message.split(" "));
+
+        for(String t: temp) {
+            System.out.println(t);
+        }
+
+        System.out.println(temp.indexOf("LOCATION:"));
+
+        return "";
+
+    }
+
     @Override
     public void run() {
+       // System.out.println("Started");
+        try {
+            this.sendMSearch();
+        }catch (IOException e) {
+            System.out.println("Error sending MSearch");
+        }
         while(true) {
             try{
                 DatagramPacket dp = this.receive();
                 if(analyzeDatagramForDial(dp)) {
-
+                    this.sendSearchResponse();
                 }
+                if(analyzeDatagramForMSeachResponse(dp)) {
+                    this.getLocationFromDatagram(dp);
+                }
+
             }catch (IOException e){
                 System.out.println("IO exception");
             }
